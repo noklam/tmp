@@ -1,3 +1,4 @@
+from urllib import response
 from adrf import views
 from django.http import Http404
 from rest_framework import renderers
@@ -21,4 +22,4 @@ class PackageView(views.APIView):
             serializer = PackageSerializer(package_info)
             return Response(serializer.data)
         except Exception as e:
-            raise Http404("Invalid package or version")
+            return Response(f"{package_name} version not found: {range}")
