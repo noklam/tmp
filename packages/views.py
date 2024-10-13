@@ -1,4 +1,3 @@
-from urllib import response
 from adrf import views
 from django.http import Http404
 from rest_framework import renderers
