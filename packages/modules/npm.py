@@ -1,13 +1,15 @@
-from urllib import request
-import requests
 import semver
+import asyncio
+import httpx
 
 from packages.models import VersionedPackage
 
 NPM_REGISTRY_URL = "https://registry.npmjs.org"
 
 
-def get_package_with_transitive_dependencies(name: str, range: str) -> VersionedPackage:
+async def get_package_with_transitive_dependencies(
+    name: str, range: str
+) -> VersionedPackage:
     """
     Recursively request package dependencies with all transitive dependencies.
     Args:
@@ -17,18 +19,20 @@ def get_package_with_transitive_dependencies(name: str, range: str) -> Versioned
     Returns:
         VersionedPackage: _description_
     """
-    package, dependencies = request_package(name, range)
-    package.dependencies = [
-        get_package_with_transitive_dependencies(name=dep_name, range=dep_range) for dep_name, dep_range in dependencies.items()
+    package, dependencies = await request_package(name, range)
+    task = [
+        get_package_with_transitive_dependencies(name=dep_name, range=dep_range)
+        for dep_name, dep_range in dependencies.items()
     ]
+    package.dependencies = await asyncio.gather(*task)
 
     return package
 
 
-def request_package(name: str, range: str) -> tuple[VersionedPackage, dict]:
+async def request_package(name: str, range: str) -> tuple[VersionedPackage, dict]:
     url = f"{NPM_REGISTRY_URL}/{name}"
 
-    npm_package = requests.get(url).json()
+    npm_package = httpx.get(url).json()
 
     versions = list(npm_package["versions"].keys())
     version = semver.max_satisfying(versions, range)
