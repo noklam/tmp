@@ -31,7 +31,7 @@ def request_package(name: str, range: str) -> tuple[VersionedPackage, dict]:
     npm_package = requests.get(url).json()
 
     versions = list(npm_package["versions"].keys())
-    version = semver.min_satisfying(versions, range)
+    version = semver.max_satisfying(versions, range)
     version_record = npm_package["versions"][version]
 
     return VersionedPackage(
