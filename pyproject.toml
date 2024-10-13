@@ -12,6 +12,7 @@ django = "^4.2.7"
 psycopg2 = "^2.9.9"
 djangorestframework = "^3.14.0"
 djangorestframework-recursive = "^0.1.2"
+adrf = "^0.1.8"
 
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.17.2"
